@@ -183,7 +183,7 @@ async function startChat() {
   await botSay('Olá, tudo bem? 😊', 1200);
   await botSay('Como posso te ajudar hoje?', 700);
   await addButtons([
-    { label: '🛍️ Fazer um pedido',      action: startPedido },
+    { label: '🛍️ Fazer um orçamento',      action: startPedido },
     { label: '📦 Prazos de entrega',    action: showPrazos },
     { label: '👤 Falar com atendente',  action: falarAtendente },
   ], 300);
@@ -193,7 +193,7 @@ async function showMenu() {
   step = 'menu';
   await botSay('Como mais posso te ajudar? 😊', 700);
   await addButtons([
-    { label: '🛍️ Fazer um pedido',      action: startPedido },
+    { label: '🛍️ Fazer um orçamento',      action: startPedido },
     { label: '📦 Prazos de entrega',    action: showPrazos },
     { label: '👤 Falar com atendente',  action: falarAtendente },
   ], 200);
@@ -204,7 +204,7 @@ async function showPrazos() {
   step = 'prazos';
   await botSay('📦 <b>Prazos de produção e entrega</b><br><br>Após aprovação da arte:<br>🛠️ Produção: 15 a 20 dias úteis<br>⚡ Entrega: 2 a 5 dias úteis', 1000);
   await addButtons([
-    { label: '🛍️ Fazer um pedido',      action: startPedido },
+    { label: '🛍️ Fazer um orçamento',      action: startPedido },
     { label: '👤 Falar com atendente',  action: falarAtendente },
     { label: '◀️ Voltar ao menu',        action: showMenu },
   ], 200);
@@ -438,7 +438,7 @@ Estado: ${userData.estado || '-'}`;
   setTimeout(async () => {
     await botSay('Posso te ajudar com mais alguma coisa? 😊', 800);
     await addButtons([
-      { label: '🛍️ Fazer um pedido',     action: startPedido },
+      { label: '🛍️ Fazer um orçamento',     action: startPedido },
       { label: '📦 Prazos de entrega',   action: showPrazos },
     ], 200);
   }, 1500);
@@ -509,7 +509,7 @@ async function finalizarOrcamento() {
   setTimeout(async () => {
     await botSay('Tem mais alguma dúvida? 😊', 800);
     await addButtons([
-      { label: '🛍️ Novo pedido',          action: startPedido },
+      { label: '🛍️ Novo orçamento',          action: startPedido },
       { label: '📦 Prazos de entrega',    action: showPrazos },
       { label: '👤 Falar com atendente',  action: falarAtendente },
     ], 200);
