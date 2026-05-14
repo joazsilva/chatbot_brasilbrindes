@@ -1,8 +1,8 @@
 // ===========================
 //  CONFIGURAÇÃO — EDITE AQUI
 // ===========================
-const NOME_EMPRESA = 'Atendimento Online';
- 
+const NOME_EMPRESA = 'Brasil Brindes';
+
 // ─── REGRAS DE ROTEAMENTO POR ESTADO ─────────────────────────────
 // Cada estado pode ter múltiplos vendedores (rodízio por hora)
 const VENDEDORES = {
@@ -23,7 +23,7 @@ const VENDEDORES = {
     { nome: 'Cristina', numero: '5599991284929' },
   ],
 };
- 
+
 // Mapa de siglas e variações de nome para o estado
 const ESTADO_MAP = {
   'pa': 'PA', 'para': 'PA', 'belem': 'PA', 'santarem': 'PA',
@@ -34,14 +34,14 @@ const ESTADO_MAP = {
   'acailandia': 'MA', 'balsas': 'MA', 'paco do lumiar': 'MA',
   'chapadinha': 'MA', 'santa ines': 'MA', 'zé doca': 'MA', 'ze doca': 'MA',
 };
- 
+
 // ─── SELEÇÃO DO VENDEDOR ─────────────────────────────────────────
 function normalizar(str) {
   return (str || '').toLowerCase()
     .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
     .replace(/[^a-z0-9 ]/g, '');
 }
- 
+
 function selecionarVendedor(cidadeEstado) {
   const texto = normalizar(cidadeEstado);
   let estadoKey = 'DEFAULT';
@@ -53,7 +53,7 @@ function selecionarVendedor(cidadeEstado) {
   return { vendedor: lista[hora % lista.length], estado: estadoKey };
 }
 // ===========================
- 
+
 // ─── CATÁLOGO DE PRODUTOS ────────────────────────────────────────
 const CATALOGO = {
   embalagens: {
@@ -84,22 +84,22 @@ const CATALOGO = {
     }
   }
 };
- 
+
 const msgs = document.getElementById('chat-messages');
 const input = document.getElementById('msg-input');
- 
+
 // Estado
 let step = 'menu';
 let userData = {};
 let uploadedImg = null;
- 
+
 function now() {
   return new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 }
 function scrollBottom() {
   setTimeout(() => msgs.scrollTo({ top: msgs.scrollHeight, behavior: 'smooth' }), 60);
 }
- 
+
 // ─── TYPING INDICATOR ────────────────────────────────────────────
 function showTyping() {
   const wrap = document.createElement('div');
@@ -114,7 +114,7 @@ function removeTyping() {
   const t = document.getElementById('typing-indicator');
   if (t) t.remove();
 }
- 
+
 // ─── ADD MESSAGE ─────────────────────────────────────────────────
 function addMessage(text, side = 'bot', delay = 0) {
   return new Promise(resolve => {
@@ -131,7 +131,7 @@ function addMessage(text, side = 'bot', delay = 0) {
     }, delay);
   });
 }
- 
+
 // ─── ADD QUICK REPLIES ───────────────────────────────────────────
 function addButtons(buttons, delay = 0) {
   return new Promise(resolve => {
@@ -155,14 +155,14 @@ function addButtons(buttons, delay = 0) {
     }, delay);
   });
 }
- 
+
 // ─── BOT SPEAK ───────────────────────────────────────────────────
 async function botSay(text, typingDelay = 900) {
   showTyping();
   await new Promise(r => setTimeout(r, typingDelay));
   await addMessage(text, 'bot');
 }
- 
+
 // ─── ENABLE/DISABLE INPUT ────────────────────────────────────────
 function enableInput() {
   input.disabled = false;
@@ -173,11 +173,11 @@ function disableInput() {
   input.disabled = true;
   document.getElementById('send-btn').disabled = true;
 }
- 
+
 // ═══════════════════════════════════════════════════════════════
 //  FLUXO PRINCIPAL
 // ═══════════════════════════════════════════════════════════════
- 
+
 async function startChat() {
   disableInput();
   await botSay('Olá, tudo bem? 😊', 1200);
@@ -188,7 +188,7 @@ async function startChat() {
     { label: '👤 Falar com atendente',  action: falarAtendente },
   ], 300);
 }
- 
+
 async function showMenu() {
   step = 'menu';
   await botSay('Como mais posso te ajudar? 😊', 700);
@@ -198,18 +198,18 @@ async function showMenu() {
     { label: '👤 Falar com atendente',  action: falarAtendente },
   ], 200);
 }
- 
+
 // ── PRAZOS ───────────────────────────────────────────────────────
 async function showPrazos() {
   step = 'prazos';
   await botSay('📦 <b>Prazos de produção e entrega</b><br><br>Após aprovação da arte:<br>🛠️ Produção: 15 a 20 dias úteis<br>⚡ Entrega: 2 a 5 dias úteis', 1000);
   await addButtons([
-    { label: '🛍️ Fazer um orçamento',      action: startPedido },
+    { label: '🛍️ Fazer um pedido',      action: startPedido },
     { label: '👤 Falar com atendente',  action: falarAtendente },
     { label: '◀️ Voltar ao menu',        action: showMenu },
   ], 200);
 }
- 
+
 // ── FALAR COM ATENDENTE ──────────────────────────────────────────
 async function falarAtendente() {
   userData = {};
@@ -219,17 +219,17 @@ async function falarAtendente() {
   await botSay('Para agilizar, me diga o seu <b>nome</b>:', 600);
   enableInput();
 }
- 
+
 // ── INÍCIO DO PEDIDO ─────────────────────────────────────────────
 async function startPedido() {
   userData = {};
   step = 'pedido_nome';
   disableInput();
-  await botSay('Ótimo! Vou te ajudar a montar seu pedido. 📋', 900);
+  await botSay('Ótimo! Vou te ajudar a montar seu orçamento. 📋', 900);
   await botSay('Primeiro, qual é o seu <b>nome</b>?', 600);
   enableInput();
 }
- 
+
 // ── ESCOLHA DE CATEGORIA ─────────────────────────────────────────
 async function escolherCategoria() {
   step = 'categoria';
@@ -242,18 +242,18 @@ async function escolherCategoria() {
     { label: '✨ Acessórios',                 action: () => escolherProduto('acessorios') },
   ], 300);
 }
- 
+
 // ── ESCOLHA DE PRODUTO DENTRO DA CATEGORIA ───────────────────────
 async function escolherProduto(categoria) {
   userData.categoria = categoria;
   step = 'produto';
   disableInput();
- 
+
   const cat = CATALOGO[categoria];
   const nomes = Object.keys(cat.itens);
- 
+
   await botSay(`Ótima escolha! Trabalhamos com os seguintes itens de <b>${cat.label}</b>:`, 800);
- 
+
   const btns = nomes.map(nome => ({
     label: nome,
     action: () => selecionarProduto(nome)
@@ -261,29 +261,135 @@ async function escolherProduto(categoria) {
   btns.push({ label: '◀️ Voltar às categorias', action: escolherCategoria });
   await addButtons(btns, 300);
 }
- 
+
 // ── PRODUTO SELECIONADO ──────────────────────────────────────────
 async function selecionarProduto(nome) {
   const cat = CATALOGO[userData.categoria];
   const info = cat.itens[nome];
- 
-  // Produto não existe no catálogo (caso digitado manualmente)
+
   if (!info) {
     await botSay('Desculpe, não trabalhamos com esse produto. 😕', 800);
     await botSay('Mas posso te ajudar com um dos nossos itens disponíveis!', 600);
     await escolherCategoria();
     return;
   }
- 
+
   userData.produto = nome;
   userData.minQtd = info.min;
   userData.unidade = info.unidade;
   userData.pedirRamo = info.pedirRamo || false;
- 
+
   await botSay(`Perfeito! <b>${nome}</b> selecionado. ✅`, 700);
-  await botSay(`ℹ️ A quantidade mínima para <b>${nome}</b> é de <b>${info.min} ${info.unidade}</b>.`, 800);
- 
-  if (info.pedirRamo) {
+  await botSay(`ℹ️ Quantidade mínima: <b>${info.min} ${info.unidade}</b>.`, 700);
+
+  // ── Produtos com carrossel de variações ──
+  if (nome === 'Sacolas plásticas') { await mostrarCarrossel('sacola'); return; }
+  if (nome === 'Ecobags')           { await mostrarCarrossel('ecobag'); return; }
+  if (nome === 'Fitas de cetim')    { await mostrarCarrossel('fita');   return; }
+
+  await proximoPasso();
+}
+
+// ─── CATÁLOGO DE CARROSSEIS ──────────────────────────────────────
+const CARROSSEIS = {
+  sacola: {
+    titulo: 'Temos 3 tipos de sacola plástica. Deslize e escolha a que mais combina 👇',
+    campo: 'tipoSacola',
+    // Após escolha: pede ramo (pedirRamo=true na sacola)
+    proximoPedirRamo: true,
+    opcoes: [
+      { emoji: '👜', nome: 'Alça Camiseta', desc: 'Alça em formato de camiseta, prática e resistente.', img: null },
+      { emoji: '🛍️', nome: 'Alça Vazada',   desc: 'Alça recortada no corpo da sacola, visual clean.',   img: null },
+      { emoji: '🎀', nome: 'Alça Fita',     desc: 'Alça em fita costurada, toque mais sofisticado.',    img: null },
+    ],
+  },
+  ecobag: {
+    titulo: 'Temos 2 tipos de Ecobag. Deslize e escolha a que mais combina 👇',
+    campo: 'tipoEcobag',
+    proximoPedirRamo: true,
+    opcoes: [
+      { emoji: '🟢', nome: 'TNT',           desc: 'Material TNT resistente, leve e econômico.',          img: null },
+      { emoji: '✨', nome: 'TNT Metalizada', desc: 'TNT com acabamento metalizado, visual sofisticado.',  img: null },
+    ],
+  },
+  fita: {
+    titulo: 'Temos 2 larguras de fita de cetim. Deslize e escolha a ideal 👇',
+    campo: 'tipoFita',
+    proximoPedirRamo: false,
+    opcoes: [
+      { emoji: '➖', nome: 'Fita de 2cm', desc: 'Fita fina, delicada, ideal para embalagens menores.', img: null },
+      { emoji: '〰️', nome: 'Fita de 3cm', desc: 'Fita mais larga, destaque e elegância nas embalagens.', img: null },
+    ],
+  },
+};
+
+async function mostrarCarrossel(tipo) {
+  const cfg = CARROSSEIS[tipo];
+  step = 'tipo_' + tipo;
+  disableInput();
+
+  await botSay(cfg.titulo, 900);
+  await new Promise(r => setTimeout(r, 400));
+
+  const wrapper = document.createElement('div');
+  wrapper.className = 'carousel-wrapper';
+
+  const hint = document.createElement('div');
+  hint.className = 'carousel-hint';
+  hint.innerHTML = cfg.opcoes.length > 2 ? '← deslize para ver mais →' : '👆 escolha uma opção';
+
+  const track = document.createElement('div');
+  track.className = 'carousel-track';
+
+  cfg.opcoes.forEach(opcao => {
+    const card = document.createElement('div');
+    card.className = 'carousel-card';
+
+    const imgEl = opcao.img
+      ? `<img src="${opcao.img}" class="carousel-img" alt="${opcao.nome}">`
+      : `<div class="carousel-img-placeholder">${opcao.emoji}</div>`;
+
+    // Escapar apóstrofos para o onclick
+    const nomeEsc = opcao.nome.replace(/'/g, "\'");
+    card.innerHTML = `
+      ${imgEl}
+      <div class="carousel-body">
+        <div class="carousel-title">${opcao.nome}</div>
+        <div class="carousel-desc">${opcao.desc}</div>
+        <button class="carousel-btn" onclick="escolherVariacao('${tipo}','${nomeEsc}',this)">Quero essa</button>
+      </div>`;
+    track.appendChild(card);
+  });
+
+  wrapper.appendChild(hint);
+  wrapper.appendChild(track);
+  msgs.appendChild(wrapper);
+  scrollBottom();
+}
+
+async function escolherVariacao(tipo, nomeOpcao, btn) {
+  const cfg = CARROSSEIS[tipo];
+  const wrapper = btn.closest('.carousel-wrapper');
+  if (wrapper) wrapper.remove();
+
+  userData[cfg.campo] = nomeOpcao;
+  await addMessage(`Quero essa — ${nomeOpcao}`, 'user');
+  await botSay(`Ótima escolha! <b>${nomeOpcao}</b> anotado. 🎉`, 700);
+
+  if (cfg.proximoPedirRamo) {
+    step = 'ramo';
+    await botSay('Para prepararmos um orçamento certeiro, qual é o <b>ramo da sua loja</b>? (ex: moda, cosméticos, papelaria, pet shop...)', 800);
+    enableInput();
+  } else {
+    step = 'quantidade';
+    await botSay(`Qual a <b>quantidade</b> desejada? (mínimo: ${userData.minQtd} ${userData.unidade})`, 700);
+    enableInput();
+  }
+}
+
+// ─── PRÓXIMO PASSO APÓS PRODUTO SELECIONADO ───────────────────────
+async function proximoPasso() {
+  if (userData.pedirRamo) {
     step = 'ramo';
     await botSay('Para prepararmos um orçamento certeiro, qual é o <b>ramo da sua loja</b>? (ex: moda, cosméticos, papelaria, pet shop...)', 900);
     enableInput();
@@ -293,18 +399,18 @@ async function selecionarProduto(nome) {
     enableInput();
   }
 }
- 
+
 // ─── SEND MESSAGE ────────────────────────────────────────────────
 async function sendMessage(text) {
   const txt = (text ?? input.value).trim();
   if (!txt && !uploadedImg) return;
- 
+
   disableInput();
   if (!text) {
     input.value = '';
     input.style.height = 'auto';
   }
- 
+
   if (uploadedImg) {
     const wrap = document.createElement('div');
     wrap.className = 'message user';
@@ -322,20 +428,20 @@ async function sendMessage(text) {
   } else if (txt) {
     await addMessage(txt, 'user');
   }
- 
+
   await handleStep(txt);
 }
- 
+
 // ─── HANDLE STEPS ────────────────────────────────────────────────
 async function handleStep(txt) {
   switch(step) {
- 
+
     // ── PEDIDO ──
     case 'pedido_nome':
       userData.nome = txt;
       await escolherCategoria();
       break;
- 
+
     case 'ramo':
       userData.ramo = txt;
       step = 'quantidade';
@@ -343,15 +449,24 @@ async function handleStep(txt) {
       await botSay(`Qual a <b>quantidade</b> desejada? (mínimo: ${userData.minQtd} ${userData.unidade})`, 700);
       enableInput();
       break;
- 
-    case 'quantidade':
+
+    case 'quantidade': {
+      const num = parseInt(txt.replace(/\D/g, ''), 10);
+      const minimo = userData.minQtd || 0;
+      if (!isNaN(num) && num < minimo) {
+        await botSay(`⚠️ Infelizmente não trabalhamos com essa quantidade. A quantidade mínima para <b>${userData.produto}</b> é de <b>${minimo} ${userData.unidade}</b>.`, 900);
+        await botSay('Por favor, informe uma quantidade igual ou maior que o mínimo 😊', 600);
+        enableInput();
+        break;
+      }
       userData.quantidade = txt;
       step = 'cidade';
       await botSay('Perfeito! ✅', 500);
       await botSay('Qual sua <b>cidade/estado</b>?', 600);
       enableInput();
       break;
- 
+    }
+
     case 'cidade':
       userData.cidade = txt;
       step = 'logo';
@@ -362,12 +477,12 @@ async function handleStep(txt) {
         { label: '❌ Não tenho no momento',   action: () => { userData.logo = 'Não'; finalizarOrcamento(); } },
       ], 300);
       break;
- 
+
     case 'logo':
       userData.logo = 'Não';
       await finalizarOrcamento();
       break;
- 
+
     // ── ATENDENTE ──
     case 'atendente_nome':
       userData.nome = txt;
@@ -376,33 +491,33 @@ async function handleStep(txt) {
       await botSay('E qual é o seu <b>estado</b> (ex: SP, RJ, MA...)?', 600);
       enableInput();
       break;
- 
+
     case 'atendente_estado':
       userData.estado = txt;
       step = 'done_atendente';
       await encaminharAtendente();
       break;
- 
+
     default:
       enableInput();
   }
 }
- 
+
 // ─── ENCAMINHAR PARA ATENDENTE ────────────────────────────────────
 async function encaminharAtendente() {
   await botSay('Perfeito! Encaminhando seus dados... ⏳', 800);
- 
+
   // ── Roteamento por estado informado ──
   const { vendedor } = selecionarVendedor(userData.estado || '');
- 
+
   const resumoWA =
 `👤 *CLIENTE QUER ATENDIMENTO*
- 
+
 Nome: ${userData.nome || '-'}
 Estado: ${userData.estado || '-'}`;
- 
+
   const link = `https://wa.me/${vendedor.numero}?text=${encodeURIComponent(resumoWA)}`;
- 
+
   const wrap = document.createElement('div');
   wrap.className = 'message bot';
   wrap.style.position = 'relative';
@@ -417,10 +532,10 @@ Estado: ${userData.estado || '-'}`;
     </div>`;
   msgs.appendChild(wrap);
   scrollBottom();
- 
+
   await new Promise(r => setTimeout(r, 600));
   await botSay('Um atendente vai te chamar em breve! Se preferir, já fale agora: 💬', 800);
- 
+
   const wa = document.createElement('div');
   wa.className = 'message bot';
   wa.style.position = 'relative';
@@ -434,7 +549,7 @@ Estado: ${userData.estado || '-'}`;
     </div>`;
   msgs.appendChild(wa);
   scrollBottom();
- 
+
   setTimeout(async () => {
     await botSay('Posso te ajudar com mais alguma coisa? 😊', 800);
     await addButtons([
@@ -443,42 +558,45 @@ Estado: ${userData.estado || '-'}`;
     ], 200);
   }, 1500);
 }
- 
+
 // ─── FINALIZAR ORÇAMENTO ─────────────────────────────────────────
 async function finalizarOrcamento() {
   step = 'finalizado';
   await botSay('Perfeito! Organizando seu orçamento... ⏳', 900);
- 
+
   const cat = CATALOGO[userData.categoria];
   const catLabel = cat ? cat.label : '-';
- 
+
   // ── Roteamento inteligente ──
   const { vendedor } = selecionarVendedor(userData.cidade);
- 
+
   const resumo =
 `📋 *NOVO ORÇAMENTO*
- 
+
 👤 Nome: ${userData.nome || '-'}
 🏷️ Categoria: ${catLabel}
-📦 Produto: ${userData.produto || '-'}${userData.ramo ? `\n🏪 Ramo da loja: ${userData.ramo}` : ''}
+📦 Produto: ${userData.produto || '-'}${userData.tipoSacola ? `\n🛍️ Tipo de alça: ${userData.tipoSacola}` : ''}${userData.tipoEcobag ? `\n🛍️ Tipo de Ecobag: ${userData.tipoEcobag}` : ''}${userData.tipoFita ? `\n🎀 Largura da fita: ${userData.tipoFita}` : ''}${userData.ramo ? `\n🏪 Ramo da loja: ${userData.ramo}` : ''}
 🔢 Quantidade: ${userData.quantidade || '-'}
 📍 Cidade/Estado: ${userData.cidade || '-'}
 🖼️ Referência enviada: ${userData.logo || 'Não'}`;
- 
+
   const waLink = `https://wa.me/${vendedor.numero}?text=${encodeURIComponent(resumo)}`;
- 
-  await botSay('Pronto! Confira o resumo do seu pedido: 📋', 800);
- 
+
+  await botSay('Pronto! Confira o resumo do seu orçamento: 📋', 800);
+
   const wrap = document.createElement('div');
   wrap.className = 'message bot';
   wrap.style.position = 'relative';
   wrap.innerHTML = `
     <div class="bubble">
       <div class="summary-card">
-        <div class="summary-title">📋 Resumo do Pedido</div>
+        <div class="summary-title">📋 Resumo do Orçamento</div>
         👤 Nome: <b>${userData.nome||'-'}</b><br>
         🏷️ Categoria: <b>${catLabel}</b><br>
         📦 Produto: <b>${userData.produto||'-'}</b><br>
+        ${userData.tipoSacola ? `🛍️ Alça: <b>${userData.tipoSacola}</b><br>` : ''}
+        ${userData.tipoEcobag ? `🛍️ Tipo Ecobag: <b>${userData.tipoEcobag}</b><br>` : ''}
+        ${userData.tipoFita ? `🎀 Largura fita: <b>${userData.tipoFita}</b><br>` : ''}
         ${userData.ramo ? `🏪 Ramo: <b>${userData.ramo}</b><br>` : ''}
         🔢 Quantidade: <b>${userData.quantidade||'-'}</b><br>
         📍 Cidade/Estado: <b>${userData.cidade||'-'}</b><br>
@@ -488,10 +606,10 @@ async function finalizarOrcamento() {
     </div>`;
   msgs.appendChild(wrap);
   scrollBottom();
- 
+
   await new Promise(r => setTimeout(r, 700));
   await botSay('Agora é só clicar abaixo para enviar para o WhatsApp do vendedor! 🚀', 800);
- 
+
   const wa = document.createElement('div');
   wa.className = 'message bot';
   wa.style.position = 'relative';
@@ -505,17 +623,17 @@ async function finalizarOrcamento() {
     </div>`;
   msgs.appendChild(wa);
   scrollBottom();
- 
+
   setTimeout(async () => {
     await botSay('Tem mais alguma dúvida? 😊', 800);
     await addButtons([
-      { label: '🛍️ Novo orçamento',          action: startPedido },
+      { label: '🛍️ Novo orçamentoo',          action: startPedido },
       { label: '📦 Prazos de entrega',    action: showPrazos },
       { label: '👤 Falar com atendente',  action: falarAtendente },
     ], 200);
   }, 1500);
 }
- 
+
 // ─── FILE UPLOAD ─────────────────────────────────────────────────
 function handleFileUpload(inp) {
   const file = inp.files[0];
@@ -527,13 +645,13 @@ function handleFileUpload(inp) {
   };
   reader.readAsDataURL(file);
 }
- 
+
 // ─── AUTO RESIZE TEXTAREA ────────────────────────────────────────
 function autoResize(el) {
   el.style.height = 'auto';
   el.style.height = Math.min(el.scrollHeight, 100) + 'px';
 }
- 
+
 // ─── INIT ────────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
   setTimeout(startChat, 600);
