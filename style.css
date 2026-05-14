@@ -95,6 +95,7 @@
   .chat-messages {
     flex: 1;
     overflow-y: auto;
+    overflow-x: hidden;   /* hidden (não clip) permite que filhos usem margens negativas */
     padding: 12px 8px 8px;
     display: flex;
     flex-direction: column;
@@ -358,25 +359,42 @@
   /* Hidden file input */
   #file-input { display: none; }
 
-  /* ── CARROSSEL DE SACOLAS ───────────────────────────────────── */
+  /* ── CARROSSEL ──────────────────────────────────────────────── */
+  /*
+     IMPORTANTE: o wrapper precisa escapar do fluxo normal das
+     mensagens (max-width: 78%) para ocupar a largura toda da tela.
+     Fazemos isso com margens negativas + largura explícita.
+  */
   .carousel-wrapper {
-    width: 100%;
-    overflow: hidden;
+    /* ocupa toda a largura do chat, ignorando o max-width das bubbles */
+    width: calc(100vw - 0px);
+    max-width: 480px;          /* mesma max-width do #app */
+    margin-left: calc(-8px);   /* compensa o padding do chat-messages */
     margin-top: 6px;
+    /* NÃO usar overflow:hidden aqui — bloqueia o scroll horizontal */
+    overflow: visible;
     animation: msgIn 0.25s ease-out;
+    align-self: stretch;       /* estica no flex column */
   }
   .carousel-track {
     display: flex;
     gap: 10px;
     overflow-x: auto;
-    padding: 4px 8px 10px;
+    overflow-y: visible;
+    padding: 4px 12px 12px;
     scroll-snap-type: x mandatory;
+    /* essencial para scroll suave em iOS */
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
+    /* evita que o pai corte o scroll */
+    touch-action: pan-x;
   }
   .carousel-track::-webkit-scrollbar { display: none; }
   .carousel-card {
-    flex: 0 0 160px;
+    /* 42vw garante ~2 cards visíveis em qualquer celular */
+    flex: 0 0 42vw;
+    max-width: 160px;
+    min-width: 130px;
     background: #fff;
     border-radius: 14px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.12);
@@ -386,35 +404,46 @@
     flex-direction: column;
     transition: transform 0.15s;
     border: 2px solid transparent;
+    /* impede que o card encolha */
+    flex-shrink: 0;
   }
   .carousel-card:active { transform: scale(0.97); }
   .carousel-img-placeholder {
     width: 100%;
-    height: 110px;
+    height: 100px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 42px;
+    font-size: 40px;
     background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+    flex-shrink: 0;
+  }
+  .carousel-img {
+    width: 100%;
+    height: 100px;
+    object-fit: cover;
+    display: block;
+    flex-shrink: 0;
   }
   .carousel-body {
-    padding: 9px 10px 11px;
+    padding: 8px 8px 10px;
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 4px;
     flex: 1;
   }
   .carousel-title {
-    font-size: 13px;
+    font-size: 12.5px;
     font-weight: 700;
     color: var(--wa-header);
     text-align: center;
   }
   .carousel-desc {
-    font-size: 11.5px;
+    font-size: 11px;
     color: var(--wa-text-secondary);
     text-align: center;
-    line-height: 1.4;
+    line-height: 1.35;
+    flex: 1;
   }
   .carousel-btn {
     margin-top: 6px;
@@ -422,18 +451,20 @@
     color: #fff;
     border: none;
     border-radius: 20px;
-    padding: 8px 12px;
-    font-size: 13px;
+    padding: 7px 10px;
+    font-size: 12.5px;
     font-weight: 600;
     cursor: pointer;
     transition: background 0.15s;
     width: 100%;
+    /* área de toque mínima para mobile */
+    min-height: 36px;
+    touch-action: manipulation;
   }
   .carousel-btn:active { background: var(--wa-green-dark); }
   .carousel-hint {
     font-size: 11px;
     color: var(--wa-text-secondary);
     text-align: center;
-    padding: 2px 8px 6px;
-
-}
+    padding: 2px 8px 5px;
+  }
