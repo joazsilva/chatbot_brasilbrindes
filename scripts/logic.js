@@ -3,6 +3,10 @@
 // ===========================
 const NOME_EMPRESA = 'Brasil Brindes';
 
+// ─── GOOGLE SHEETS WEBHOOK ───────────────────────────────────────
+// Cole aqui a URL gerada após implantar o Apps Script
+const SHEETS_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbywdYg0Uwg7W0YWSg81lDBV4GjKR9q8BpUIAMUsMsIW838_hb_6xzyMOrIPEzrP6Gp-5w/exec';
+
 // ─── REGRAS DE ROTEAMENTO POR ESTADO ─────────────────────────────
 // Cada estado pode ter múltiplos vendedores (rodízio por hora)
 const VENDEDORES = {
@@ -298,9 +302,9 @@ const CARROSSEIS = {
     // Após escolha: pede ramo (pedirRamo=true na sacola)
     proximoPedirRamo: true,
     opcoes: [
-      { emoji: '👜', nome: 'Alça Camiseta', desc: 'Alça em formato de camiseta, prática e resistente.', img: null },
-      { emoji: '🛍️', nome: 'Alça Vazada',   desc: 'Alça recortada no corpo da sacola, visual clean.',   img: null },
-      { emoji: '🎀', nome: 'Alça Fita',     desc: 'Alça em fita costurada, toque mais sofisticado.',    img: null },
+      { emoji: '👜', nome: 'Alça Camiseta', desc: 'Alça em formato de camiseta, prática e resistente.', img: 'assets/alca-camiseta.jpg' },
+      { emoji: '🛍️', nome: 'Alça Vazada',   desc: 'Alça recortada no corpo da sacola, visual clean.',   img: 'assets/alca-vazada.jpg' },
+      { emoji: '🎀', nome: 'Alça Fita',     desc: 'Alça em fita costurada, toque mais sofisticado.',    img: 'assets/alca-fita.jpg' },
     ],
   },
   ecobag: {
@@ -308,8 +312,8 @@ const CARROSSEIS = {
     campo: 'tipoEcobag',
     proximoPedirRamo: true,
     opcoes: [
-      { emoji: '🟢', nome: 'TNT',           desc: 'Material TNT resistente, leve e econômico.',          img: null },
-      { emoji: '✨', nome: 'TNT Metalizada', desc: 'TNT com acabamento metalizado, visual sofisticado.',  img: null },
+      { emoji: '🟢', nome: 'TNT',           desc: 'Material TNT resistente, leve e econômico.',          img: 'assets/tnt-normal.jpg' },
+      { emoji: '✨', nome: 'TNT Metalizada', desc: 'TNT com acabamento metalizado, visual sofisticado.',  img: 'assets/tnt-metalizada.jpg' },
     ],
   },
   fita: {
@@ -317,8 +321,8 @@ const CARROSSEIS = {
     campo: 'tipoFita',
     proximoPedirRamo: false,
     opcoes: [
-      { emoji: '➖', nome: 'Fita de 2cm', desc: 'Fita fina, delicada, ideal para embalagens menores.', img: null },
-      { emoji: '〰️', nome: 'Fita de 3cm', desc: 'Fita mais larga, destaque e elegância nas embalagens.', img: null },
+      { emoji: '➖', nome: 'Fita de 2cm', desc: 'Fita fina, delicada, ideal para embalagens menores.', img: 'assets/fita-2cm.jpg' },
+      { emoji: '〰️', nome: 'Fita de 3cm', desc: 'Fita mais larga, destaque e elegância nas embalagens.', img: 'assets/fita-3cm.jpg' },
     ],
   },
 };
@@ -559,9 +563,39 @@ Estado: ${userData.estado || '-'}`;
   }, 1500);
 }
 
+// ─── REGISTRAR NO GOOGLE SHEETS (silencioso) ─────────────────────
+async function registrarNoSheets() {
+  if (!SHEETS_WEBHOOK_URL || SHEETS_WEBHOOK_URL === 'COLE_AQUI_A_URL_DO_APPS_SCRIPT') return;
+  try {
+    const cat = CATALOGO[userData.categoria];
+    const { vendedor } = selecionarVendedor(userData.cidade);
+    const payload = {
+      nome:       userData.nome       || '-',
+      categoria:  cat ? cat.label     : '-',
+      produto:    userData.produto    || '-',
+      tipoSacola: userData.tipoSacola || '',
+      tipoEcobag: userData.tipoEcobag || '',
+      tipoFita:   userData.tipoFita   || '',
+      ramo:       userData.ramo       || '-',
+      quantidade: userData.quantidade || '-',
+      cidade:     userData.cidade     || '-',
+      logo:       userData.logo       || 'Não',
+      vendedor:   vendedor.nome       || '-',
+    };
+    // Fire-and-forget: não bloqueia o fluxo do cliente
+    fetch(SHEETS_WEBHOOK_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    }).catch(() => {}); // ignora erros silenciosamente
+  } catch (_) {}
+}
+
 // ─── FINALIZAR ORÇAMENTO ─────────────────────────────────────────
 async function finalizarOrcamento() {
   step = 'finalizado';
+  registrarNoSheets(); // silencioso, não aguarda resposta
   await botSay('Perfeito! Organizando seu orçamento... ⏳', 900);
 
   const cat = CATALOGO[userData.categoria];
