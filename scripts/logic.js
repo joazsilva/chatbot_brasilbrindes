@@ -13,18 +13,18 @@ const VENDEDORES = {
   // Pará → Marcos (horas pares) | Rosana (horas ímpares)
   'PA': [
     { nome: 'Marcos', numero: '5591993124440' },
-    { nome: 'Rosana', numero: '5599984023179' },
+    { nome: 'Marcos', numero: '5591993124440' },
   ],
   // Maranhão → Cristina (horas pares) | Rosana (horas ímpares)
   'MA': [
     { nome: 'Marcos', numero: '5591993124440' },
-    { nome: 'Rosana',   numero: '5599984023179' },
+    { nome: 'Marcos',   numero: '5591993124440' },
   ],
   // Fallback (outros estados) → rodízio entre todos
   'DEFAULT': [
-    { nome: 'Rosana',   numero: '5599984023179' },
     { nome: 'Marcos',   numero: '5591993124440' },
-    { nome: 'Marcos2', numero: '5591993124440' },
+    { nome: 'Marcos',   numero: '5591993124440' },
+    { nome: 'Marcos', numero: '5591993124440' },
   ],
 };
 
