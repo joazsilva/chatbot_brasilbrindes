@@ -17,14 +17,14 @@ const VENDEDORES = {
   ],
   // Maranhão → Cristina (horas pares) | Rosana (horas ímpares)
   'MA': [
-    { nome: 'Cristina', numero: '5599991284929' },
+    { nome: 'Marcos', numero: '5591993124440' },
     { nome: 'Rosana',   numero: '5599984023179' },
   ],
   // Fallback (outros estados) → rodízio entre todos
   'DEFAULT': [
     { nome: 'Rosana',   numero: '5599984023179' },
     { nome: 'Marcos',   numero: '5591993124440' },
-    { nome: 'Cristina', numero: '5599991284929' },
+    { nome: 'Marcos2', numero: '5591993124440' },
   ],
 };
 
