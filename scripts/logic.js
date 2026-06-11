@@ -216,22 +216,38 @@ async function showPrazos() {
 
 // ── FALAR COM ATENDENTE ──────────────────────────────────────────
 async function falarAtendente() {
+  const nomeSalvo = userData.nome || null;
   userData = {};
   step = 'atendente_nome';
   disableInput();
   await botSay('Claro! Vou te conectar com um de nossos atendentes. 😊', 900);
-  await botSay('Para agilizar, me diga o seu <b>nome</b>:', 600);
-  enableInput();
+  if (nomeSalvo) {
+    userData.nome = nomeSalvo;
+    await botSay(`Escolha com qual atendente deseja falar, <b>${nomeSalvo}</b>:`, 600);
+    await addButtons([
+      { label: '1️⃣ Marcos',  action: () => encaminharAtendenteEscolhido({ nome: 'Marcos',  numero: '5591993124440' }) },
+      { label: '2️⃣ Cristina', action: () => encaminharAtendenteEscolhido({ nome: 'Cristina', numero: '559991284929' }) },
+    ], 300);
+  } else {
+    await botSay('Para agilizar, me diga o seu <b>nome</b>:', 600);
+    enableInput();
+  }
 }
 
 // ── INÍCIO DO PEDIDO ─────────────────────────────────────────────
 async function startPedido() {
+  const nomeSalvo = userData.nome || null;
   userData = {};
   step = 'pedido_nome';
   disableInput();
   await botSay('Ótimo! Vou te ajudar a montar seu orçamento. 📋', 900);
-  await botSay('Primeiro, qual é o seu <b>nome</b>?', 600);
-  enableInput();
+  if (nomeSalvo) {
+    userData.nome = nomeSalvo;
+    await escolherCategoria();
+  } else {
+    await botSay('Primeiro, qual é o seu <b>nome</b>?', 600);
+    enableInput();
+  }
 }
 
 // ── ESCOLHA DE CATEGORIA ─────────────────────────────────────────
@@ -385,9 +401,7 @@ async function escolherVariacao(tipo, nomeOpcao, btn) {
     await botSay('Para prepararmos um orçamento certeiro, qual é o <b>ramo da sua loja</b>? (ex: moda, cosméticos, papelaria, pet shop...)', 800);
     enableInput();
   } else {
-    step = 'quantidade';
-    await botSay(`Qual a <b>quantidade</b> desejada? (mínimo: ${userData.minQtd} ${userData.unidade})`, 700);
-    enableInput();
+    await perguntarQuantidade();
   }
 }
 
@@ -398,10 +412,42 @@ async function proximoPasso() {
     await botSay('Para prepararmos um orçamento certeiro, qual é o <b>ramo da sua loja</b>? (ex: moda, cosméticos, papelaria, pet shop...)', 900);
     enableInput();
   } else {
-    step = 'quantidade';
-    await botSay('Qual a <b>quantidade</b> que você precisa?', 700);
+    await perguntarQuantidade();
+  }
+}
+
+async function perguntarQuantidade() {
+  step = 'quantidade';
+  const produto = userData.produto;
+
+  if (produto === 'Sacolas de papel') {
+    await botSay('Qual a <b>quantidade</b> desejada?', 700);
+    await addButtons([
+      { label: '200 unidades', action: () => confirmarQuantidade('200') },
+      { label: '500 unidades', action: () => confirmarQuantidade('500') },
+      { label: '1000 unidades', action: () => confirmarQuantidade('1000') },
+      { label: '1500 unidades', action: () => confirmarQuantidade('1500') },
+    ], 300);
+  } else if (produto === 'Sacolas plásticas') {
+    await botSay('Qual a <b>quantidade</b> desejada?', 700);
+    await addButtons([
+      { label: '500 unidades', action: () => confirmarQuantidade('500') },
+      { label: '1000 unidades', action: () => confirmarQuantidade('1000') },
+      { label: '1500 unidades', action: () => confirmarQuantidade('1500') },
+      { label: '2000 unidades', action: () => confirmarQuantidade('2000') },
+    ], 300);
+  } else {
+    await botSay(`Qual a <b>quantidade</b> que você precisa? (mínimo: ${userData.minQtd} ${userData.unidade})`, 700);
     enableInput();
   }
+}
+
+async function confirmarQuantidade(qtd) {
+  userData.quantidade = qtd;
+  step = 'cidade';
+  await botSay('Perfeito! ✅', 500);
+  await botSay('Qual sua <b>cidade/estado</b>?', 600);
+  enableInput();
 }
 
 // ─── SEND MESSAGE ────────────────────────────────────────────────
@@ -426,7 +472,13 @@ async function sendMessage(text) {
     document.getElementById('file-input').value = '';
     if (step === 'logo') {
       userData.logo = 'Sim';
-      await finalizarOrcamento();
+      step = 'observacoes';
+      await botSay('Imagem recebida! 📎✅', 600);
+      await botSay('Alguma <b>observação</b> ou dúvida que queira deixar para o vendedor? (pode digitar aqui ou clique em "Não tenho observações")', 800);
+      await addButtons([
+        { label: '✅ Não tenho observações', action: () => { userData.observacoes = ''; finalizarOrcamento(); } },
+      ], 300);
+      enableInput();
       return;
     }
   } else if (txt) {
@@ -448,10 +500,8 @@ async function handleStep(txt) {
 
     case 'ramo':
       userData.ramo = txt;
-      step = 'quantidade';
       await botSay(`Anotado! 📝 Ramo: <b>${txt}</b>.`, 600);
-      await botSay(`Qual a <b>quantidade</b> desejada? (mínimo: ${userData.minQtd} ${userData.unidade})`, 700);
-      enableInput();
+      await perguntarQuantidade();
       break;
 
     case 'quantidade': {
@@ -478,28 +528,54 @@ async function handleStep(txt) {
       await botSay('Você tem uma <b>logo ou referência</b> para enviar? Use o ícone de imagem ao lado 📎', 700);
       await addButtons([
         { label: '📎 Tenho logo/referência',  action: () => { step = 'logo'; enableInput(); } },
-        { label: '❌ Não tenho no momento',   action: () => { userData.logo = 'Não'; finalizarOrcamento(); } },
+        {
+          label: '❌ Não tenho no momento',
+          action: async () => {
+            userData.logo = 'Não';
+            step = 'observacoes';
+            await botSay('Tudo bem! 😊', 500);
+            await botSay('Alguma <b>observação</b> ou dúvida que queira deixar para o vendedor? (pode digitar aqui ou clique em "Não tenho observações")', 800);
+            await addButtons([
+              { label: '✅ Não tenho observações', action: () => { userData.observacoes = ''; finalizarOrcamento(); } },
+            ], 300);
+            enableInput();
+          }
+        },
       ], 300);
       break;
 
     case 'logo':
       userData.logo = 'Não';
+      step = 'observacoes';
+      await botSay('Alguma <b>observação</b> ou dúvida que queira deixar para o vendedor? (pode digitar aqui ou clique em "Não tenho observações")', 800);
+      await addButtons([
+        { label: '✅ Não tenho observações', action: () => { userData.observacoes = ''; finalizarOrcamento(); } },
+      ], 300);
+      enableInput();
+      break;
+
+    case 'observacoes':
+      userData.observacoes = txt;
       await finalizarOrcamento();
       break;
 
     // ── ATENDENTE ──
     case 'atendente_nome':
       userData.nome = txt;
-      step = 'atendente_estado';
-      await botSay(`Obrigado, <b>${txt}</b>! 😊`, 600);
-      await botSay('E qual é o seu <b>estado</b> (ex: SP, RJ, MA...)?', 600);
-      enableInput();
-      break;
-
-    case 'atendente_estado':
-      userData.estado = txt;
       step = 'done_atendente';
-      await encaminharAtendente();
+      disableInput();
+      await botSay(`Obrigado, <b>${txt}</b>! 😊`, 600);
+      await botSay('Escolha com qual atendente deseja falar:', 600);
+      await addButtons([
+        {
+          label: '1️⃣ Marcos',
+          action: () => encaminharAtendenteEscolhido({ nome: 'Marcos', numero: '5591993124440' })
+        },
+        {
+          label: '2️⃣ Cristina',
+          action: () => encaminharAtendenteEscolhido({ nome: 'Cristina', numero: '559991284929' })
+        },
+      ], 300);
       break;
 
     default:
@@ -508,17 +584,13 @@ async function handleStep(txt) {
 }
 
 // ─── ENCAMINHAR PARA ATENDENTE ────────────────────────────────────
-async function encaminharAtendente() {
+async function encaminharAtendenteEscolhido(vendedor) {
   await botSay('Perfeito! Encaminhando seus dados... ⏳', 800);
-
-  // ── Roteamento por estado informado ──
-  const { vendedor } = selecionarVendedor(userData.estado || '');
 
   const resumoWA =
 `👤 *CLIENTE QUER ATENDIMENTO*
 
-Nome: ${userData.nome || '-'}
-Estado: ${userData.estado || '-'}`;
+Nome: ${userData.nome || '-'}`;
 
   const link = `https://wa.me/${vendedor.numero}?text=${encodeURIComponent(resumoWA)}`;
 
@@ -529,8 +601,7 @@ Estado: ${userData.estado || '-'}`;
     <div class="bubble">
       <div class="summary-card">
         <div class="summary-title">👤 Seus dados</div>
-        👤 Nome: <b>${userData.nome||'-'}</b><br>
-        📍 Estado: <b>${userData.estado||'-'}</b>
+        👤 Nome: <b>${userData.nome||'-'}</b>
       </div>
       <div class="bubble-time">${now()}</div>
     </div>`;
@@ -580,6 +651,7 @@ async function registrarNoSheets() {
       quantidade: userData.quantidade || '-',
       cidade:     userData.cidade     || '-',
       logo:       userData.logo       || 'Não',
+      observacoes: userData.observacoes || '',
       vendedor:   vendedor.nome       || '-',
     };
     // Fire-and-forget: não bloqueia o fluxo do cliente
@@ -612,7 +684,7 @@ async function finalizarOrcamento() {
 📦 Produto: ${userData.produto || '-'}${userData.tipoSacola ? `\n🛍️ Tipo de alça: ${userData.tipoSacola}` : ''}${userData.tipoEcobag ? `\n🛍️ Tipo de Ecobag: ${userData.tipoEcobag}` : ''}${userData.tipoFita ? `\n🎀 Largura da fita: ${userData.tipoFita}` : ''}${userData.ramo ? `\n🏪 Ramo da loja: ${userData.ramo}` : ''}
 🔢 Quantidade: ${userData.quantidade || '-'}
 📍 Cidade/Estado: ${userData.cidade || '-'}
-🖼️ Referência enviada: ${userData.logo || 'Não'}`;
+🖼️ Referência enviada: ${userData.logo || 'Não'}${userData.observacoes ? `\n💬 Observações: ${userData.observacoes}` : ''}`;
 
   const waLink = `https://wa.me/${vendedor.numero}?text=${encodeURIComponent(resumo)}`;
 
@@ -635,6 +707,7 @@ async function finalizarOrcamento() {
         🔢 Quantidade: <b>${userData.quantidade||'-'}</b><br>
         📍 Cidade/Estado: <b>${userData.cidade||'-'}</b><br>
         🖼️ Referência: <b>${userData.logo||'Não'}</b>
+        ${userData.observacoes ? `<br>💬 Observações: <b>${userData.observacoes}</b>` : ''}
       </div>
       <div class="bubble-time">${now()}</div>
     </div>`;
