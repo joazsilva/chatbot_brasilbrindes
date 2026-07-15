@@ -12,19 +12,19 @@ const SHEETS_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbywdYg0Uwg7W
 const VENDEDORES = {
   // Pará → Marcos (horas pares) | Rosana (horas ímpares)
   'PA': [
-    { nome: 'Marcos', numero: '5591993124440' },
-    { nome: 'Marcos', numero: '5591993124440' },
+    { nome: 'Rosana', numero: '5599984023179' },
+    { nome: 'Rosana', numero: '5599984023179' },
   ],
   // Maranhão → Cristina (horas pares) | Rosana (horas ímpares)
   'MA': [
-    { nome: 'Marcos', numero: '5591993124440' },
-    { nome: 'Marcos',   numero: '5591993124440' },
+    { nome: 'Rosana', numero: '5599984023179' },
+    { nome: 'Rosana',   numero: '5599984023179' },
   ],
   // Fallback (outros estados) → rodízio entre todos
   'DEFAULT': [
-    { nome: 'Marcos',   numero: '5591993124440' },
-    { nome: 'Marcos',   numero: '5591993124440' },
-    { nome: 'Marcos', numero: '5591993124440' },
+    { nome: 'Rosana',   numero: '5599984023179' },
+    { nome: 'Rosana',   numero: '5599984023179' },
+    { nome: 'Rosana', numero: '5599984023179' },
   ],
 };
 
